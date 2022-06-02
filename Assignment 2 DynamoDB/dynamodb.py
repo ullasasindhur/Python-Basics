@@ -2,8 +2,8 @@ from urllib import response
 import boto3
 from boto3.dynamodb.conditions import Key
 
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table('Music')
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("Music")
 
 
 def create_table():
@@ -11,48 +11,27 @@ def create_table():
         table = dynamodb.create_table(
             TableName="Music",
             KeySchema=[
-                {
-                    'AttributeName': "Artist",
-                    'KeyType': "HASH"
-                },
-                {
-                    'AttributeName': 'SongTitle',
-                    'KeyType': "RANGE"
-                }
+                {"AttributeName": "Artist", "KeyType": "HASH"},
+                {"AttributeName": "SongTitle", "KeyType": "RANGE"},
             ],
             AttributeDefinitions=[
-                {
-                    "AttributeName": "Artist",
-                    "AttributeType": "S"
-                },
-                {
-                    "AttributeName": "SongTitle",
-                    "AttributeType": "S"
-                }
+                {"AttributeName": "Artist", "AttributeType": "S"},
+                {"AttributeName": "SongTitle", "AttributeType": "S"},
             ],
             BillingMode="PROVISIONED",
-            ProvisionedThroughput={
-                "ReadCapacityUnits": 5,
-                "WriteCapacityUnits": 5
-            },
+            ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
             Tags=[
+                {"Key": "emp_id", "Value": "GS-3103"},
                 {
-                    'Key': 'emp_id',
-                    'Value': 'GS-3103'
+                    "Key": "project_manager",
+                    "Value": "Pankaj Khamkar",
                 },
                 {
-                    'Key': 'project_manager',
-                    'Value': 'Pankaj Khamkar',
+                    "Key": "duration",
+                    "Value": "31-May-2022",
                 },
-                {
-                    'Key': 'duration',
-                    'Value': '31-May-2022',
-                },
-                {
-                    'Key': 'purpose',
-                    'Value': 'testing'
-                }
-            ]
+                {"Key": "purpose", "Value": "testing"},
+            ],
         )
     except Exception:
         return "Cannot create table, may be it already present"
@@ -63,12 +42,7 @@ def create_table():
 
 def add_song(artist, songTitle):
     try:
-        output = table.put_item(
-            Item={
-                'Artist': artist,
-                'SongTitle': songTitle
-            }
-        )
+        output = table.put_item(Item={"Artist": artist, "SongTitle": songTitle})
     except Exception as e:
         return "Error Occured in add song"
     return output
@@ -76,16 +50,16 @@ def add_song(artist, songTitle):
 
 def query_table(artist):
     return table.query(
-        KeyConditionExpression=Key('Artist').eq(artist),
+        KeyConditionExpression=Key("Artist").eq(artist),
     )
 
 
 def query_artist(artist):
     try:
         response = query_table(artist)
-        items = response['Items']
+        items = response["Items"]
         if len(items):
-            return sorted(items, key=lambda item: item['SongTitle'], reverse=True)
+            return sorted(items, key=lambda item: item["SongTitle"], reverse=True)
         else:
             return "Nothing Found with the Artist Name"
     except Exception as e:
@@ -102,10 +76,10 @@ def delete_table():
 
 if __name__ == "__main__":
     print(create_table())
-    songTitle = input('Enter song title:\t')
-    artistName = input('Enter artist name:\t')
+    songTitle = input("Enter song title:\t")
+    artistName = input("Enter artist name:\t")
     print(add_song(artistName, songTitle))
-    artistSearch = input('Enter artist name for searching:\t')
+    artistSearch = input("Enter artist name for searching:\t")
     print(query_artist(artistSearch))
     # add_song('Sid Sriram', 'A')
     # add_song('Sid Sriram', 'B')
